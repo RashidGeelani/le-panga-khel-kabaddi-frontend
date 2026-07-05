@@ -12,7 +12,18 @@
 //   { id: 11, team1: "Dal Defenders", team2: "North Star XI", date: "11 Sep 2026", time: "10:00 AM", ground: "Ground A", status: "completed", score1: "51", score2: "44", winner: "Dal Defenders" },
 //   { id: 12, team1: "Himalayan Hawks", team2: "Kashmir Thunder", date: "11 Sep 2026", time: "12:00 PM", ground: "Ground B", status: "completed", score1: "39", score2: "47", winner: "Kashmir Thunder" },
 // ];
-
+interface Fixture {
+  id: number;
+  team1: string;
+  team2: string;
+  date: string;
+  time: string;
+  ground: string;
+  status: "upcoming" | "completed";
+  score1?: string;
+  score2?: string;
+  winner?: string;
+}
 
 const FIXTURES: Fixture[] = [
   {
