@@ -36,7 +36,6 @@ interface Team {
   email: string;
   players: {
   name: string;
-  photo: File | null;
 }[]
   logo: string;
   payment: string;
@@ -44,7 +43,6 @@ interface Team {
 }
 type Player = {
   name: string;
-  photo: File | null;
 };
 
 type RegistrationForm = {
@@ -76,7 +74,7 @@ export const gradient =
   "linear-gradient(135deg, #4338CA 0%, #9333EA 30%, #EC4899 65%, #F59E0B 100%)";
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const TOURNAMENT_START = new Date("2026-07-12T05:59:59").getTime();
+const TOURNAMENT_START = new Date("2026-07-15T05:59:59").getTime();
 
 
 
@@ -435,9 +433,9 @@ async function loadTeams() {
             {
   type: "warning",
   color: "bg-amber-500",
-  title: "Registration closes on 12 July",
+  title: "Registration closes on 15 July",
   date: "12 Jul",
-  body: "The last date for online registration is 12 July 2026. All teams must complete their registration and payment before the deadline. No late entries will be accepted."
+  body: "The last date for online registration is 15 July 2026. All teams must complete their registration and payment before the deadline. No late entries will be accepted."
 },
 {
   type: "info",
@@ -577,6 +575,10 @@ async function loadTeams() {
 // ─── Register Page ────────────────────────────────────────────────────────────
 
 function RegisterPage() {
+  const createPlayers = () =>
+  Array.from({ length: 10 }, () => ({
+    name: "",
+  }));
   const [form, setForm] = useState<RegistrationForm>({
   teamName: "",
   captainName: "",
@@ -585,11 +587,9 @@ function RegisterPage() {
   altPhone: "",
   email: "",
   district: "",
-  players: Array.from({ length: 12 }, () => ({
-    name: "",
-    photo: null as File | null,
-  })),
+  players: createPlayers(),
 });
+const [captainPhoto, setCaptainPhoto] = useState<File | null>(null);
   const [logo, setLogo] = useState<File | null>(null);
   const [payment, setPayment] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -601,6 +601,7 @@ function RegisterPage() {
   captainName: "",
   district: "",
 });
+
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
   const setPlayer = (index: number, name: string) => {
     setForm((prev) => { 
@@ -613,24 +614,11 @@ function RegisterPage() {
     });
   };
 
-  const setPlayerPhoto = (index: number, file: File | null) => {
-    setForm((prev) => {
-      const players = [...prev.players];
-      players[index].photo = file;
-
-      return {
-        ...prev,
-        players,
-      };
-    });
-  };
-
-
   const API_URL = import.meta.env.VITE_API_URL 
   // || "http://localhost:5000"
   ;
 const upiId = "muzamilmushtaq5321@oksbi";
-const name = encodeURIComponent("Le Panga Khel Kabaddi");
+const name = encodeURIComponent("Muzamil Mushtaq");
 const amount = 5000;
 
 const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
@@ -657,7 +645,6 @@ const handleSubmit = async (e: FormEvent) => {
   if (!phone) return toast.error("Please enter your phone number.");
   if (!email) return toast.error("Please enter your email address.");
   if (!district) return toast.error("Please select your district.");
-
   if (!phoneRegex.test(phone))
     return toast.error("Please enter a valid 10-digit mobile number.");
 
@@ -683,29 +670,20 @@ const handleSubmit = async (e: FormEvent) => {
   if (uniquePlayers.size !== players.length)
     return toast.error("Duplicate player names are not allowed.");
 
-  // Player photo validation
-  for (let i = 0; i < form.players.length; i++) {
-    const player = form.players[i];
-    const hasName = player.name.trim() !== "";
-    const hasPhoto = !!player.photo;
-
-    if (hasName && !hasPhoto) {
-      return toast.error(`Please upload a photo for Player ${i + 1}.`);
-    }
-    if (!hasName && hasPhoto) {
-      return toast.error(`Please enter the name for Player ${i + 1}.`);
-    }
-    if (hasPhoto && player.photo!.size > MAX_FILE_SIZE) {
-      return toast.error(`Player ${i + 1} photo must be under 2 MB.`);
-    }
-  }
-
-  if (logo) {
-    if (!logo.type.startsWith("image/"))
+  if (!logo)
+    return toast.error("Please upload the payment screenshot.");
+  if (!logo.type.startsWith("image/"))
       return toast.error("Team logo must be an image.");
-    if (logo.size > MAX_FILE_SIZE)
+  if (logo.size > MAX_FILE_SIZE)
       return toast.error("Team logo must be under 2 MB.");
-  }
+  
+  
+  if (!captainPhoto)
+  return toast.error("Please upload the captain's photograph.");
+  if (!captainPhoto.type.startsWith("image/"))
+      return toast.error("Captain Photo must be an image.");
+  if (captainPhoto.size > MAX_FILE_SIZE)
+      return toast.error("Captain Photo must be under 2 MB.");
 
   if (!payment)
     return toast.error("Please upload the payment screenshot.");
@@ -727,16 +705,13 @@ const handleSubmit = async (e: FormEvent) => {
     fd.append("phone", phone);
     fd.append("altPhone", altPhone);
     fd.append("email", email);
+    fd.append("captainPhoto", captainPhoto);
     fd.append("district", district);
     fd.append("players", JSON.stringify(
       form.players.filter((p) => p.name.trim()).map((p) => p.name.trim())
     ));
 
-    form.players.forEach((player, index) => {
-      if (player.name.trim() && player.photo) {
-        fd.append(`playerPhoto${index + 1}`, player.photo);
-      }
-    });
+    
 
     if (logo) fd.append("logo", logo);
     fd.append("payment", payment);
@@ -757,11 +732,11 @@ const handleSubmit = async (e: FormEvent) => {
     setForm({
       teamName: "", captainName: "", managerName: "",
       phone: "", altPhone: "", email: "", district: "",
-      players: Array.from({ length: 12 }, () => ({ name: "", photo: null })),
+      players: createPlayers(),
     });
     setLogo(null);
     setPayment(null);
-
+    setCaptainPhoto(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
     setStatus("success");
 
@@ -795,6 +770,9 @@ if (status === "success") {
           captainName: "",
           district: "",
         });
+        setLogo(null);
+        setCaptainPhoto(null);
+        setPayment(null);
       }}
     />
   );
@@ -813,7 +791,7 @@ if (status === "error") {
   return (
     <div className="min-h-screen px-4 py-8 max-w-2xl mx-auto">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <SectionHeader label="Join the Tournament" title="Register Your Team" subtitle="Secure your spot before 12 July 2026" />
+        <SectionHeader label="Join the Tournament" title="Register Your Team" subtitle="Secure your spot before 15 July 2026" />
 
         <GlassCard className="p-5 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-7">
@@ -824,7 +802,7 @@ if (status === "error") {
               <InputField label="Team Name" value={form.teamName} onChange={v => set("teamName", v)} placeholder="e.g. Warriors United" required />
               <div>
                 <label className="text-white/50 text-xs font-semibold uppercase tracking-wider mb-1.5 block">
-                  Team Logo <span className="text-white/20 normal-case tracking-normal">(Optional)</span>
+                  Team Logo <span className="text-red-400 ml-1">*</span>
                 </label>
                 <label className="flex items-center gap-3 bg-white/5 border border-white/10 border-dashed rounded-xl px-4 py-4 cursor-pointer hover:border-purple-500/30 hover:bg-white/[0.07] transition-all">
                   <Upload size={16} className="text-white/25" />
@@ -886,69 +864,128 @@ if (status === "error") {
               </div>
             </div>
 
-            {/* Players */}
-            <div className="space-y-4">
-              <div className="text-white/30 text-xs font-semibold uppercase tracking-widest border-b border-white/[0.06] pb-2">
-                Squad — 12 Players
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-  {form.players.map((player, i) => (
-    <div
-      key={i}
-      className="bg-white/[0.03] border border-white/10 rounded-2xl p-4"
-    >
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-white font-semibold">
-          Player {i + 1}
-          {/* {i < 7 && <span className="text-red-400"> *</span>} */}
-        </span>
+            {/* Squad */}
+
+<div className="space-y-5">
+
+  <div className="text-white/30 text-xs font-semibold uppercase tracking-widest border-b border-white/[0.06] pb-2">
+    Squad Details (7–10 Players)
+  </div>
+
+  {/* Captain Photo */}
+
+  <GlassCard className="p-5">
+
+    <div className="flex items-center justify-between mb-4">
+
+      <div>
+        <h4 className="text-white font-semibold">
+          Captain Photograph
+          <span className="text-red-400 ml-1">*</span>
+        </h4>
+
+        <p className="text-white/40 text-sm mt-1">
+          Upload a recent passport-size photograph of the team captain.
+        </p>
       </div>
 
-      {/* Player Name */}
-      <input
-        value={player.name}
-        onChange={(e) => setPlayer(i, e.target.value)}
-        placeholder={i === 0 ? "Captain Name" : `Player ${i + 1} Name`}
-        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-white/20 focus:outline-none focus:border-purple-500 mb-3"
-      />
+    </div>
 
-      {/* Player Photo */}
+    <label className="flex items-center gap-4 border border-dashed border-white/10 rounded-2xl bg-white/5 hover:bg-white/[0.08] hover:border-purple-500/40 transition-all cursor-pointer p-5">
+
+      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
+        <Upload size={22} className="text-white" />
+      </div>
+
+      <div className="flex-1">
+
+        <div className="text-white font-medium truncate">
+          {captainPhoto
+            ? captainPhoto.name
+            : "Choose Captain Photograph"}
+        </div>
+
+        <div className="text-white/40 text-sm mt-1">
+          JPG, PNG • Maximum 2 MB
+        </div>
+
+      </div>
+
       <input
         type="file"
         accept="image/*"
+        className="hidden"
         onChange={(e) =>
-          setPlayerPhoto(i, e.target.files?.[0] || null)
+          setCaptainPhoto(e.target.files?.[0] ?? null)
         }
-        className="w-full text-sm text-white/70
-          file:mr-4
-          file:px-4
-          file:py-2
-          file:rounded-lg
-          file:border-0
-          file:bg-purple-600
-          file:text-white
-          file:cursor-pointer
-          file:hover:bg-purple-500"
       />
 
-      {/* Preview */}
-      {player.photo && (
-        <div className="mt-3 flex items-center gap-3">
-          <img
-            src={URL.createObjectURL(player.photo)}
-            alt={player.name}
-            className="w-14 h-14 rounded-xl object-cover border border-white/10"
-          />
+    </label>
 
-          <span className="text-xs text-white/60 truncate">
-            {player.photo.name}
-          </span>
+    {captainPhoto && (
+
+      <div className="mt-5 flex items-center gap-4">
+
+        <img
+          src={URL.createObjectURL(captainPhoto)}
+          alt="Captain"
+          className="w-20 h-20 rounded-2xl object-cover border border-white/10"
+        />
+
+        <div>
+
+          <div className="text-white font-medium">
+            Captain Photo Selected
+          </div>
+
+          <div className="text-white/40 text-sm">
+            {captainPhoto.name}
+          </div>
+
         </div>
-      )}
-    </div>
-  ))}
+
+      </div>
+
+    )}
+
+  </GlassCard>
+
+  {/* Players */}
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+    {form.players.map((player, i) => (
+
+      <div
+        key={i}
+        className="bg-white/[0.03] border border-white/10 rounded-2xl p-4"
+      >
+
+        <div className="text-white font-semibold mb-3">
+          Player {i + 1}
+          {i < 7 && (
+            <span className="text-red-400 ml-1">*</span>
+          )}
+        </div>
+
+        <input
+          value={player.name}
+          onChange={(e) => setPlayer(i, e.target.value)}
+          placeholder={
+            i === 0
+              ? "Captain Name"
+              : `Player ${i + 1} Name`
+          }
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white placeholder-white/20 focus:outline-none focus:border-purple-500 transition-all"
+        />
+
+      </div>
+
+    ))}
+
+  </div>
+
 </div>
-            </div>
 
               {/* pay through */}
     
@@ -1029,12 +1066,12 @@ if (status === "error") {
   <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl px-4 py-4">
 
     <span className="text-base sm:text-lg font-semibold text-white">
-      0730042000600345
+      0730040150001447
     </span>
 
     <button
       onClick={() => {
-        navigator.clipboard.writeText("0730042000600345");
+        navigator.clipboard.writeText("0730040150001447");
         toast.success("Account Number copied!");
       }}
       className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition"
@@ -1174,7 +1211,7 @@ if (status === "error") {
 
             {/* Payment */}
             <div>
-              <div className="text-white/30 text-xs font-semibold uppercase tracking-widest border-b border-white/[0.06] pb-2 mb-4">Payment Proof</div>
+              <div className="text-white/30 text-xs font-semibold uppercase tracking-widest border-b border-white/[0.06] pb-2 mb-4 ">Payment Proof<span className="text-red-400 ml-1">*</span></div>
               <label className="flex items-center gap-3 bg-white/5 border border-white/10 border-dashed rounded-xl px-4 py-4 cursor-pointer hover:border-purple-500/30 hover:bg-white/[0.07] transition-all">
                 <Upload size={16} className="text-white/25" />
                 <span className="text-sm text-white/30 truncate">{payment ? payment.name : "Upload payment screenshot"}</span>
