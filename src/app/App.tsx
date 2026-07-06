@@ -813,7 +813,7 @@ if (status === "error") {
   return (
     <div className="min-h-screen px-4 py-8 max-w-2xl mx-auto">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <SectionHeader label="Join the Tournament" title="Register Your Team" subtitle="Secure your spot before 15 September 2026" />
+        <SectionHeader label="Join the Tournament" title="Register Your Team" subtitle="Secure your spot before 12 July 2026" />
 
         <GlassCard className="p-5 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-7">
