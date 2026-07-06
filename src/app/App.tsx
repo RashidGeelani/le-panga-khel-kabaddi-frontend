@@ -76,7 +76,7 @@ export const gradient =
   "linear-gradient(135deg, #4338CA 0%, #9333EA 30%, #EC4899 65%, #F59E0B 100%)";
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const TOURNAMENT_START = new Date("2026-09-18T09:00:00").getTime();
+const TOURNAMENT_START = new Date("2026-07-12T05:59:59").getTime();
 
 
 
@@ -233,7 +233,9 @@ function HomePage({
   }) {
   const time = useCountdown(TOURNAMENT_START);
   const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000";
+  import.meta.env.VITE_API_URL 
+  // || "http://localhost:5000"
+  ;
 
 const [teams, setTeams] = useState<Team[]>([]);
 const [loading, setLoading] = useState(true);
@@ -347,7 +349,7 @@ async function loadTeams() {
           <div className="text-center mb-10">
 
   <p className="text-sm uppercase tracking-[0.35em] text-purple-400 font-semibold mb-5">
-    Tournament Begins In
+    Registration Ends In
   </p>
 
   <div className="flex items-center justify-center gap-1 sm:gap-3 md:gap-4">
@@ -391,7 +393,7 @@ async function loadTeams() {
 </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pb-5">
             <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
               onClick={() => navigate("register")}
               className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold px-8 py-4 rounded-2xl text-base flex items-center gap-2.5 shadow-[0_0_40px_rgba(109,94,248,0.45)] hover:shadow-[0_0_60px_rgba(109,94,248,0.6)] transition-all w-full sm:w-auto justify-center">
@@ -412,7 +414,7 @@ async function loadTeams() {
             {[
               { icon: Users, v: "16", l: "Teams" },
               { icon: Target, v: "32", l: "Matches" },
-              { icon: Calendar, v: "5", l: "Days" },
+              { icon: Calendar, v: "20", l: "Days" },
               { icon: Award, v: "₹50K", l: "Prize" },
             ].map(({ icon: Icon, v, l }) => (
               <GlassCard key={l} className="p-2.5 sm:p-4 text-center">
@@ -430,9 +432,27 @@ async function loadTeams() {
         <SectionHeader label="Latest News" title="Announcements" />
         <div className="space-y-3">
           {[
-            { type: "warning", color: "bg-amber-500", title: "Registration closes on 15 September", date: "1 Sep", body: "All teams must complete registration and payment before 15 September 2026. No late entries will be accepted." },
-            { type: "info", color: "bg-blue-500", title: "Entry Fee: ₹3,000 per team", date: "28 Aug", body: "Participation fee is ₹3,000 per team. Submit payment proof (PhonePe/GPay) with your registration form." },
-            { type: "success", color: "bg-emerald-500", title: "Venue Confirmed: Nowpora Kalan Ground", date: "25 Aug", body: "All matches will be held at Nowpora Kalan Ground, Sopore with two playing arenas and dedicated spectator stands." },
+            {
+  type: "warning",
+  color: "bg-amber-500",
+  title: "Registration closes on 12 July",
+  date: "12 Jul",
+  body: "The last date for online registration is 12 July 2026. All teams must complete their registration and payment before the deadline. No late entries will be accepted."
+},
+{
+  type: "info",
+  color: "bg-blue-500",
+  title: "Entry Fee: ₹5,000 per team",
+  date: "Now",
+  body: "The participation fee is ₹5,000 per team. Complete the online payment and upload the payment proof during registration."
+},
+{
+  type: "success",
+  color: "bg-emerald-500",
+  title: "Venue Confirmed: Nowpora Kalan Ground",
+  date: "Soon",
+  body: "All matches will be held at Nowpora Kalan Ground, Sopore with two playing arenas and dedicated spectator stands."
+},
           ].map((a, i) => (
             <motion.div key={i} initial={{ opacity: 0, x: -16 }} whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
@@ -606,10 +626,12 @@ function RegisterPage() {
   };
 
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const upiId = "syedraashidgeelani@okicici";
+  const API_URL = import.meta.env.VITE_API_URL 
+  // || "http://localhost:5000"
+  ;
+const upiId = "muzamilmushtaq5321@oksbi";
 const name = encodeURIComponent("Le Panga Khel Kabaddi");
-const amount = 3000;
+const amount = 5000;
 
 const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
 const handleSubmit = async (e: FormEvent) => {
@@ -963,10 +985,8 @@ if (status === "error") {
             </div>
 
               {/* pay through */}
-            
-            
-
-<GlassCard className="relative overflow-hidden p-6 sm:p-8 mb-8">
+    
+<GlassCard className="relative overflow-hidden p-4 sm:p-6 lg:p-8 mb-8">
 
   {/* Background Glow */}
   <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-blue-500/5 pointer-events-none" />
@@ -974,7 +994,7 @@ if (status === "error") {
   <div className="relative z-10">
 
     {/* Header */}
-    <div className="flex items-center justify-between mb-6">
+    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
 
       <div>
         <h3 className="text-2xl font-bold text-white">
@@ -995,7 +1015,7 @@ if (status === "error") {
 
     </div>
 
-    <div className="grid md:grid-cols-[220px_1fr] gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 md:gap-8">
 
       {/* QR */}
       <div className="flex justify-center">
@@ -1027,10 +1047,69 @@ if (status === "error") {
           </p>
 
           <h2 className="text-5xl font-black bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent mt-2">
-            ₹3000
+            ₹5000
           </h2>
 
         </div>
+
+        {/* Account Number */}
+
+<div className="mt-6">
+
+  <p className="uppercase tracking-[0.25em] text-xs text-white/40 font-semibold mb-2">
+    Account Number
+  </p>
+
+  <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl px-4 py-4">
+
+    <span className="text-base sm:text-lg font-semibold text-white">
+      0730042000600345
+    </span>
+
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText("0730042000600345");
+        toast.success("Account Number copied!");
+      }}
+      className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition"
+    >
+      <Copy size={18} />
+      Copy
+    </button>
+
+  </div>
+
+</div>
+
+{/* IFSC Code */}
+
+<div className="mt-4">
+
+  <p className="uppercase tracking-[0.25em] text-xs text-white/40 font-semibold mb-2">
+    IFSC Code
+  </p>
+
+  <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl px-4 py-4">
+
+    <span className="text-base sm:text-lg font-semibold text-white">
+      JAKA0NWKLAN
+    </span>
+
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText("JAKA0NWKLAN");
+        toast.success("IFSC Code copied!");
+      }}
+      className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition"
+    >
+      <Copy size={18} />
+      Copy
+    </button>
+
+  </div>
+
+</div>
+
 
         <div className="mt-6">
 
@@ -1041,7 +1120,7 @@ if (status === "error") {
           <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl px-4 py-4">
 
             <span className="text-lg font-semibold text-white">
-              syedraashidgeelani@okicici|₹3,000
+              Copy UPI ID to Pay
             </span>
 
             <button
@@ -1067,7 +1146,7 @@ if (status === "error") {
           Pay via UPI
         </a>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-white/40">
+        <div className="mt-4 flex flex-wrap justify-center items-center gap-2 text-xs text-white/40">
 
           <span className="bg-white/5 rounded-full px-3 py-1">
             PhonePe
@@ -1102,7 +1181,7 @@ if (status === "error") {
       <ul className="space-y-2 text-sm text-white/70 list-disc pl-5">
 
         <li>
-          Pay the <strong>₹500</strong> registration fee before submitting the form.
+          Pay the <strong>₹5000</strong> registration fee before submitting the form.
         </li>
 
         <li>
@@ -1168,7 +1247,9 @@ function TeamsPage({
   onSelect: (id: string) => void;
 }) {
   const API_URL =
-    import.meta.env.VITE_API_URL || "http://localhost:5000";
+    import.meta.env.VITE_API_URL 
+    // || "http://localhost:5000"
+    ;
 
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1279,7 +1360,9 @@ function TeamDetailPage({
   navigate: (p: Page) => void;
 }) {
   const API_URL =
-    import.meta.env.VITE_API_URL || "http://localhost:5000";
+    import.meta.env.VITE_API_URL 
+    // || "http://localhost:5000"
+    ;
 
   const [team, setTeam] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -1450,7 +1533,9 @@ className="w-24 h-24 rounded-full object-cover mx-auto border"
 function FixturesPage() {
   const [filter, setFilter] = useState<FixtureFilter>("upcoming");
   const filtered = FIXTURES.filter(f => f.status === filter);
-   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+   const API_URL = import.meta.env.VITE_API_URL 
+  //  || "http://localhost:5000"
+   ;
    const [teams, setTeams] = useState<Team[]>([]);
    const [loading, setLoading] = useState(true);
    useEffect(() => {
@@ -1634,6 +1719,29 @@ function RulesPage() {
 // ─── Contact Page ─────────────────────────────────────────────────────────────
 
 function ContactPage() {
+  const socialLinks = [
+  {
+    icon: Instagram,
+    label: "Instagram",
+    gradient: "from-pink-600 to-purple-700",
+    handle: "@LPKK_nowpora",
+    url: "https://www.instagram.com/le_panga_khel_kabaddi_nowpora?igsh=Y2xwd2Q2OW9hb2Nh",
+  },
+  {
+    icon: Facebook,
+    label: "Facebook",
+    gradient: "from-blue-700 to-blue-500",
+    handle: "@LPKK_nowpora",
+    url: "https://www.facebook.com/profile.php?id=100094439109400",
+  },
+  {
+    icon: Youtube,
+    label: "YouTube",
+    gradient: "from-red-700 to-red-500",
+    handle: "Le Panga Khel",
+    url: "https://youtube.com/@yourchannel",
+  },
+];
   return (
     <div className="min-h-screen px-4 py-8 max-w-2xl mx-auto">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -1647,9 +1755,9 @@ function ContactPage() {
             </h3>
             <div className="space-y-2.5">
               {[
-                { href: "tel:+919622000000", icon: Phone, label: "Phone", value: "+91 9622 XXXXXX", bg: "bg-green-500/10", iconColor: "text-green-400" },
-                { href: "https://wa.me/919622000000", icon: MessageCircle, label: "WhatsApp", value: "+91 9622 XXXXXX", bg: "bg-emerald-500/10", iconColor: "text-emerald-400" },
-                { href: "mailto:lepangakhel@gmail.com", icon: Mail, label: "Email", value: "lepangakhel@gmail.com", bg: "bg-blue-500/10", iconColor: "text-blue-400" },
+                { href: "tel:+917006810740", icon: Phone, label: "Phone", value: "+917006 810740", bg: "bg-green-500/10", iconColor: "text-green-400" },
+                { href: "https://wa.me/7006043254", icon: MessageCircle, label: "WhatsApp", value: "+91 7006 043254", bg: "bg-emerald-500/10", iconColor: "text-emerald-400" },
+                { href: "mailto:muzamilmushtaq5321@gmail.com", icon: Mail, label: "Email", value: "muzamilmushtaq5321@gmail.com", bg: "bg-blue-500/10", iconColor: "text-blue-400" },
               ].map(({ href, icon: Icon, label, value, bg, iconColor }) => (
                 <a key={label} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer"
                   className="flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.05] rounded-xl p-3.5 transition-all group">
@@ -1687,42 +1795,166 @@ function ContactPage() {
           </GlassCard>
 
           {/* Social */}
-          <GlassCard className="p-5 sm:p-6">
-            <h3 className="text-white font-bold mb-4 text-sm">Follow for Updates</h3>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { icon: Instagram, label: "Instagram", gradient: "from-pink-600 to-purple-700", handle: "@lepangakhel" },
-                { icon: Facebook, label: "Facebook", gradient: "from-blue-700 to-blue-500", handle: "Le Panga Khel" },
-                { icon: Youtube, label: "YouTube", gradient: "from-red-700 to-red-500", handle: "Le Panga Khel" },
-              ].map(({ icon: Icon, label, gradient, handle }) => (
-                <motion.button key={label} whileHover={{ y: -3 }}
-                  className="flex flex-col items-center gap-2 bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.05] rounded-xl p-4 transition-all">
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center`}>
-                    <Icon size={16} className="text-white" />
-                  </div>
-                  <div className="text-white text-xs font-semibold">{label}</div>
-                  <div className="text-white/25 text-[9px]">{handle}</div>
-                </motion.button>
-              ))}
-            </div>
-          </GlassCard>
+          <div className="grid grid-cols-3 gap-3">
+  {socialLinks.map(({ icon: Icon, label, gradient, handle, url }) => (
+    <motion.a
+      key={label}
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      whileHover={{ y: -3 }}
+      className="flex flex-col items-center gap-2 bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.05] rounded-xl p-4 transition-all cursor-pointer"
+    >
+      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center`}>
+        <Icon size={16} className="text-white" />
+      </div>
+
+      <div className="text-white text-xs font-semibold">{label}</div>
+
+      <div className="text-white/25 text-[9px] text-center">{handle}</div>
+    </motion.a>
+  ))}
+</div>
 
           {/* Organizer Info */}
           <GlassCard className="p-5 sm:p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(109,94,248,0.3)]">
-                <Trophy size={20} className="text-white" />
-              </div>
-              <div>
-                <div className="text-white font-bold">Le Panga Khel Kabaddi</div>
-                <div className="text-white/40 text-sm mt-0.5">Organised by the Youth Sports Committee</div>
-                <div className="text-white/30 text-xs mt-0.5">Nowpora Kalan, Sopore, Kashmir</div>
-              </div>
-            </div>
+
+  <div className="flex items-center gap-4">
+
+    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(109,94,248,0.3)]">
+      <Trophy size={20} className="text-white" />
+    </div>
+
+    <div>
+      <h3 className="text-white font-bold text-lg">
+        Organising Committee
+      </h3>
+
+      <p className="text-white/40 text-sm">
+        Le Panga Khel Kabaddi – Season 11
+      </p>
+
+      <p className="text-white/30 text-xs mt-0.5">
+        Sports Forum Nowpora • Nowpora Kalan, Sopore
+      </p>
+    </div>
+
+  </div>
+
+  <div className="mt-6 space-y-4">
+
+    <div className="border border-white/10 rounded-2xl p-4 bg-white/5">
+      <p className="text-purple-400 text-xs uppercase tracking-widest">
+        President
+      </p>
+      <h4 className="text-white text-lg font-semibold mt-1">
+        Jalal Uddin Qadir
+      </h4>
+    </div>
+
+    <div className="border border-white/10 rounded-2xl p-4 bg-white/5">
+      <p className="text-purple-400 text-xs uppercase tracking-widest">
+        Organising Secretary
+      </p>
+      <h4 className="text-white text-lg font-semibold mt-1">
+        Fayaz Ahmad Dar
+      </h4>
+      <p className="text-white/60 text-sm">
+        Physical Education Teacher
+      </p>
+      <p className="text-green-400 text-sm mt-1">
+        📞 7006810740
+      </p>
+    </div>
+
+    <div className="border border-white/10 rounded-2xl p-4 bg-white/5">
+      <p className="text-purple-400 text-xs uppercase tracking-widest">
+        Coordinator
+      </p>
+      <h4 className="text-white text-lg font-semibold mt-1">
+        Shahnawaz Dar
+      </h4>
+      <p className="text-green-400 text-sm mt-1">
+        📞 7006043254
+      </p>
+    </div>
+
+    <div className="border border-white/10 rounded-2xl p-4 bg-white/5">
+      <p className="text-purple-400 text-xs uppercase tracking-widest">
+        Technical Advisor
+      </p>
+      <h4 className="text-white text-lg font-semibold mt-1">
+        Shahid Shabir
+      </h4>
+    </div>
+
+  </div>
+
+  <div className="mt-6">
+
+    <h4 className="text-white font-semibold mb-3">
+      Committee Members
+    </h4>
+
+    <div className="flex flex-wrap gap-2">
+
+      {[
+        "Faiz War",
+        "Ashiq Hussain",
+        "Asif Farooq",
+        "Mansoor Ahmad",
+        "Amir Zahoor",
+        "Mushkoor",
+        "Amir Iqbal",
+        "Muzamil Mushtaq",
+        "Moomin Qayoom",
+        "M Rafi Dar",
+        "Sahil Showkat",
+      ].map((member) => (
+        <span
+          key={member}
+          className="px-3 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-white/70 hover:border-purple-500/40 transition"
+        >
+          {member}
+        </span>
+      ))}
+
+    </div>
+
+  </div>
+
           </GlassCard>
         </div>
       </motion.div>
+
+       {/* hikzenlabs */}
+      <GlassCard className="p-4 mt-10 text-center">
+  <p className="text-white/40 text-xs uppercase tracking-widest">
+    Technology Partner
+  </p>
+
+  <h4 className="text-white font-semibold mt-2">
+    Hikzen Labs
+  </h4>
+
+  <p className="text-white/50 text-sm mt-1">
+    Designed, Developed & Maintained by Hikzen Labs
+  </p>
+
+  <a
+    href="https://hikzenlabs.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block mt-3 text-purple-400 hover:text-purple-300 text-sm"
+  >
+    hikzenlabs.com
+  </a>
+</GlassCard>
     </div>
+
+    
+
+    
   );
 }
 
