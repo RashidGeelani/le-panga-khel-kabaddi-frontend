@@ -636,11 +636,11 @@ const amount = 5000;
 const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
 const handleSubmit = async (e: FormEvent) => {
   e.preventDefault();
-
   if (submitting) return;
 
   const phoneRegex = /^[6-9]\d{9}$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB (consistent everywhere)
 
   const teamName = form.teamName.trim();
   const captainName = form.captainName.trim();
@@ -650,165 +650,131 @@ const handleSubmit = async (e: FormEvent) => {
   const email = form.email.trim();
   const district = form.district.trim();
 
-  const players = form.players
-    .filter((player) => player.name.trim() !== ""
-  );
-    
+  // ─── ALL VALIDATIONS FIRST ─────────────────────────────
 
-  // Required Fields
-  if (!teamName)
-    return toast.error("Please enter your team name.");
+  if (!teamName) return toast.error("Please enter your team name.");
+  if (!captainName) return toast.error("Please enter the captain's name.");
+  if (!phone) return toast.error("Please enter your phone number.");
+  if (!email) return toast.error("Please enter your email address.");
+  if (!district) return toast.error("Please select your district.");
 
-  if (!captainName)
-    return toast.error("Please enter the captain's name.");
-
-  if (!phone)
-    return toast.error("Please enter your phone number.");
-
-  if (!email)
-    return toast.error("Please enter your email address.");
-
-  if (!district)
-    return toast.error("Please select your district.");
-
-  // Phone Validation
   if (!phoneRegex.test(phone))
     return toast.error("Please enter a valid 10-digit mobile number.");
 
   if (altPhone) {
     if (!phoneRegex.test(altPhone))
       return toast.error("Please enter a valid alternate number.");
-
     if (phone === altPhone)
-      return toast.error(
-        "Phone number and alternate phone cannot be the same."
-      );
+      return toast.error("Phone number and alternate phone cannot be the same.");
   }
 
-  // Email Validation
   if (!emailRegex.test(email))
     return toast.error("Please enter a valid email address.");
 
-  // Length Validation
-  if (teamName.length < 3)
-    return toast.error("Team name is too short.");
+  if (teamName.length < 3) return toast.error("Team name is too short.");
+  if (captainName.length < 3) return toast.error("Captain name is too short.");
 
-  if (captainName.length < 3)
-    return toast.error("Captain name is too short.");
+  const players = form.players.filter((p) => p.name.trim() !== "");
 
-  // Players Validation
   if (players.length < 7)
     return toast.error("Please enter at least 7 player names.");
 
-  const uniquePlayers = new Set(
-    players.map((player) => player.name.toLowerCase())
-  );
-
+  const uniquePlayers = new Set(players.map((p) => p.name.toLowerCase()));
   if (uniquePlayers.size !== players.length)
     return toast.error("Duplicate player names are not allowed.");
 
-  // Logo Validation
+  // Player photo validation
+  for (let i = 0; i < form.players.length; i++) {
+    const player = form.players[i];
+    const hasName = player.name.trim() !== "";
+    const hasPhoto = !!player.photo;
+
+    if (hasName && !hasPhoto) {
+      return toast.error(`Please upload a photo for Player ${i + 1}.`);
+    }
+    if (!hasName && hasPhoto) {
+      return toast.error(`Please enter the name for Player ${i + 1}.`);
+    }
+    if (hasPhoto && player.photo!.size > MAX_FILE_SIZE) {
+      return toast.error(`Player ${i + 1} photo must be under 2 MB.`);
+    }
+  }
+
   if (logo) {
     if (!logo.type.startsWith("image/"))
       return toast.error("Team logo must be an image.");
-
-    if (logo.size > 2 * 1024 * 1024)
+    if (logo.size > MAX_FILE_SIZE)
       return toast.error("Team logo must be under 2 MB.");
   }
 
-  // Payment Validation
   if (!payment)
     return toast.error("Please upload the payment screenshot.");
-
   if (!payment.type.startsWith("image/"))
     return toast.error("Payment proof must be an image.");
-
-  if (payment.size > 2 * 1024 * 1024)
+  if (payment.size > MAX_FILE_SIZE)
     return toast.error("Payment screenshot must be under 2 MB.");
+
+  // ─── NOW SET LOADING ───────────────────────────────────
+
   setStatus("loading");
   setSubmitting(true);
 
   try {
-  const fd = new FormData();
+    const fd = new FormData();
+    fd.append("teamName", teamName);
+    fd.append("captainName", captainName);
+    fd.append("managerName", managerName);
+    fd.append("phone", phone);
+    fd.append("altPhone", altPhone);
+    fd.append("email", email);
+    fd.append("district", district);
+    fd.append("players", JSON.stringify(
+      form.players.filter((p) => p.name.trim()).map((p) => p.name.trim())
+    ));
 
-  fd.append("teamName", teamName);
-  fd.append("captainName", captainName);
-  fd.append("managerName", managerName);
-  fd.append("phone", phone);
-  fd.append("altPhone", altPhone);
-  fd.append("email", email);
-  fd.append("district", district);
-  fd.append("players", JSON.stringify(
-    form.players.filter((p)=> p.name.trim())
-    .map((p)=> p.name.trim())
-  ));
-  form.players.forEach((player, index) => {
-    if (player.name.trim() && player.photo) {
-      fd.append(`playerPhoto${index + 1}`, player.photo);
+    form.players.forEach((player, index) => {
+      if (player.name.trim() && player.photo) {
+        fd.append(`playerPhoto${index + 1}`, player.photo);
+      }
+    });
+
+    if (logo) fd.append("logo", logo);
+    fd.append("payment", payment);
+
+    const response = await fetch(`${API_URL}/api/register`, {
+      method: "POST",
+      body: fd,
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.message || "Registration failed.");
     }
-  }); 
 
-    if (logo) {
-      fd.append("logo", logo);
-    }
+    setRegistrationId(result.registrationId);
+    setRegisteredTeam({ teamName, captainName, district });
 
-  fd.append("payment", payment);
+    setForm({
+      teamName: "", captainName: "", managerName: "",
+      phone: "", altPhone: "", email: "", district: "",
+      players: Array.from({ length: 12 }, () => ({ name: "", photo: null })),
+    });
+    setLogo(null);
+    setPayment(null);
 
-  const response = await fetch(`${API_URL}/api/register`, {
-    method: "POST",
-    body: fd,
-  });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setStatus("success");
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.message || "Registration failed.");
+  } catch (error) {
+    console.error(error);
+    setErrorMessage(
+      error instanceof Error ? error.message : "Unable to submit registration. Please try again."
+    );
+    setStatus("error");
+  } finally {
+    setSubmitting(false);
   }
-
-  setRegistrationId(result.registrationId);
-
-  setRegisteredTeam({
-    teamName,
-    captainName,
-    district,
-  });
-
-  // Reset form
-  setForm({
-    teamName: "",
-    captainName: "",
-    managerName: "",
-    phone: "",
-    altPhone: "",
-    email: "",
-    district: "",
-    players: Array(12).fill(""),
-  });
-
-  setLogo(null);
-  setPayment(null);
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth",
-  });
-
-  // Show success screen AFTER everything is reset
-  setStatus("success");
-
-} catch (error: any) {
-  console.error(error);
-
-  setErrorMessage(
-    error.message || "Unable to submit registration. Please try again."
-  );
-
-  setStatus("error");
-
-} finally {
-  setSubmitting(false);
-}
-  };
+};
 
   if (status === "loading") {
   return <RegistrationLoading />;
