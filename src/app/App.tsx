@@ -1050,7 +1050,7 @@ if (status === "error") {
           </p>
 
           <h2 className="text-5xl font-black bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent mt-2">
-            ₹5000
+            ₹2000
           </h2>
 
         </div>
