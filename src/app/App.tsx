@@ -1184,7 +1184,7 @@ if (status === "error") {
       <ul className="space-y-2 text-sm text-white/70 list-disc pl-5">
 
         <li>
-          Pay the <strong>₹5000</strong> registration fee before submitting the form.
+          Pay the <strong>₹2000</strong> registration fee before submitting the form.
         </li>
 
         <li>
