@@ -619,7 +619,7 @@ const [captainPhoto, setCaptainPhoto] = useState<File | null>(null);
   ;
 const upiId = "muzamilmushtaq5321@oksbi";
 const name = encodeURIComponent("Muzamil Mushtaq");
-const amount = 5000;
+const amount = 2000;
 
 const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
 const handleSubmit = async (e: FormEvent) => {
