@@ -74,7 +74,7 @@ export const gradient =
   "linear-gradient(135deg, #4338CA 0%, #9333EA 30%, #EC4899 65%, #F59E0B 100%)";
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const TOURNAMENT_START = new Date("2026-07-15T05:59:59").getTime();
+const TOURNAMENT_START = new Date("2026-07-30T14:59:59").getTime();
 
 
 
@@ -347,7 +347,7 @@ async function loadTeams() {
           <div className="text-center mb-10">
 
   <p className="text-sm uppercase tracking-[0.35em] text-purple-400 font-semibold mb-5">
-    Registration Ends In
+    Inaugration Match Begins in
   </p>
 
   <div className="flex items-center justify-center gap-1 sm:gap-3 md:gap-4">
